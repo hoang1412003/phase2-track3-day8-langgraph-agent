@@ -1,14 +1,11 @@
-"""State schema for the Day 08 LangGraph lab.
-
-Students should extend the schema only when needed. Keep state lean and serializable.
-"""
+"""State schema for the Day 08 LangGraph lab."""
 
 from __future__ import annotations
 
 from enum import StrEnum
+from operator import add
 from typing import Annotated, Any, TypedDict
 
-from operator import add
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -17,7 +14,6 @@ class Route(StrEnum):
     TOOL = "tool"
     MISSING_INFO = "missing_info"
     RISKY = "risky"
-    ERROR = "error"
     DEAD_LETTER = "dead_letter"
     DONE = "done"
 
@@ -36,13 +32,25 @@ class ApprovalDecision(BaseModel):
     approved: bool = False
     reviewer: str = "mock-reviewer"
     comment: str = ""
+    action: str = "approve"
+    edited_action: str | None = None
+
+
+class AgentError(BaseModel):
+    """Typed error payload for retry, tool, and dead-letter failures."""
+
+    type: str
+    message: str
+    node: str
+    retryable: bool = False
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class AgentState(TypedDict, total=False):
-    """LangGraph state.
+    """Serializable LangGraph state.
 
-    TODO(student): decide which fields should be append-only and which should be overwritten.
-    The current annotations give a safe starting point for auditability.
+    Overwrite fields hold the latest routing decision or final result. Annotated list fields are
+    append-only reducers so every node can leave an audit trail without mutating prior state.
     """
 
     thread_id: str
@@ -52,14 +60,17 @@ class AgentState(TypedDict, total=False):
     risk_level: str
     attempt: int
     max_attempts: int
+    evaluation_result: str
+    pending_question: str | None
+    proposed_action: str | None
+    approval: dict[str, Any] | None
     final_answer: str | None
-    # TODO(student): you will need additional fields for clarification, risky actions,
-    # approval decisions, and retry-loop gating. Add them as you implement nodes.
-    # Hint: check what your nodes return and what your routing functions read.
     messages: Annotated[list[str], add]
     tool_results: Annotated[list[str], add]
-    errors: Annotated[list[str], add]
+    errors: Annotated[list[dict[str, Any]], add]
     events: Annotated[list[dict[str, Any]], add]
+    audit_events: Annotated[list[dict[str, Any]], add]
+    nodes_visited: Annotated[list[str], add]
 
 
 class Scenario(BaseModel):
@@ -89,14 +100,47 @@ def initial_state(scenario: Scenario) -> AgentState:
         "risk_level": "unknown",
         "attempt": 0,
         "max_attempts": scenario.max_attempts,
+        "evaluation_result": "",
+        "pending_question": None,
+        "proposed_action": None,
+        "approval": None,
         "final_answer": None,
         "messages": [],
         "tool_results": [],
         "errors": [],
         "events": [],
+        "audit_events": [],
+        "nodes_visited": [],
     }
 
 
-def make_event(node: str, event_type: str, message: str, **metadata: Any) -> dict[str, Any]:
+def make_event(
+    node: str,
+    event_type: str,
+    message: str,
+    **metadata: object,
+) -> dict[str, Any]:
     """Create a normalized event payload."""
-    return LabEvent(node=node, event_type=event_type, message=message, metadata=metadata).model_dump()
+    return LabEvent(
+        node=node,
+        event_type=event_type,
+        message=message,
+        metadata=metadata,
+    ).model_dump()
+
+
+def make_error(
+    error_type: str,
+    message: str,
+    node: str,
+    retryable: bool = False,
+    **metadata: object,
+) -> dict[str, Any]:
+    """Create a serializable typed error payload."""
+    return AgentError(
+        type=error_type,
+        message=message,
+        node=node,
+        retryable=retryable,
+        metadata=metadata,
+    ).model_dump()

@@ -1,0 +1,274 @@
+{
+  "total_questions": 10,
+  "phrase_success_rate": 0.3,
+  "top1_success_rate": 0.0,
+  "overall_success_rate": 0.0,
+  "note": "This LangGraph lab has no retrieval corpus for expected doc IDs; top1 checks are reported as unavailable.",
+  "results": [
+    {
+      "id": "gq_d10_01",
+      "question": "Theo chính sách hoàn tiền hiện hành, khách hàng có tối đa bao nhiêu ngày làm việc để gửi yêu cầu hoàn tiền sau khi đơn được xác nhận?",
+      "route": "simple",
+      "answer": "Theo chính sách hoàn tiền hiện hành, khách hàng có tối đa 7 ngày làm việc để gửi yêu cầu hoàn tiền sau khi đơn được xác nhận.",
+      "latency_ms": 8973,
+      "must_contain_any": [
+        "7 ngày",
+        "7 ngày làm việc"
+      ],
+      "must_not_contain": [
+        "14 ngày",
+        "14 ngày làm việc"
+      ],
+      "phrase_pass": true,
+      "forbidden_pass": true,
+      "expected_top1_doc_id": "policy_refund_v4",
+      "observed_top1_doc_id": null,
+      "top1_pass": false,
+      "passed": false,
+      "errors": [
+        "top1 retrieval not available in this LangGraph lab"
+      ],
+      "grading_criteria": [
+        "Nêu đúng 7 ngày làm việc",
+        "Không chấp nhận 14 ngày là chính sách hiện hành",
+        "Top-1 retrieval nên đến từ policy_refund_v4"
+      ]
+    },
+    {
+      "id": "gq_d10_02",
+      "question": "Đâu là loại sản phẩm bị loại khỏi điều kiện hoàn tiền?",
+      "route": "simple",
+      "answer": "Xin lỗi, nhưng không có thông tin cụ thể nào về loại sản phẩm bị loại khỏi điều kiện hoàn tiền. Bạn có thể cung cấp thêm chi tiết để tôi hỗ trợ tốt hơn không?",
+      "latency_ms": 2623,
+      "must_contain_any": [
+        "hàng kỹ thuật số",
+        "license key",
+        "subscription"
+      ],
+      "must_not_contain": [],
+      "phrase_pass": false,
+      "forbidden_pass": true,
+      "expected_top1_doc_id": "policy_refund_v4",
+      "observed_top1_doc_id": null,
+      "top1_pass": false,
+      "passed": false,
+      "errors": [
+        "missing required answer phrase",
+        "top1 retrieval not available in this LangGraph lab"
+      ],
+      "grading_criteria": [
+        "Nêu đúng nhóm sản phẩm không được hoàn tiền",
+        "Không lấy ngoại lệ chung ngẫu nhiên"
+      ]
+    },
+    {
+      "id": "gq_d10_03",
+      "question": "Finance Team xử lý yêu cầu hoàn tiền trong bao lâu?",
+      "route": "risky",
+      "answer": "Yêu cầu hoàn tiền đã được phê duyệt và đang chuẩn bị để thực hiện. Thời gian xử lý sẽ phụ thuộc vào quy trình của đội ngũ tài chính.",
+      "latency_ms": 2332,
+      "must_contain_any": [
+        "3-5 ngày làm việc",
+        "3 đến 5 ngày"
+      ],
+      "must_not_contain": [],
+      "phrase_pass": false,
+      "forbidden_pass": true,
+      "expected_top1_doc_id": "policy_refund_v4",
+      "observed_top1_doc_id": null,
+      "top1_pass": false,
+      "passed": false,
+      "errors": [
+        "missing required answer phrase",
+        "top1 retrieval not available in this LangGraph lab"
+      ],
+      "grading_criteria": [
+        "Nêu đúng thời gian xử lý 3-5 ngày làm việc",
+        "Phải là thông tin từ policy_refund_v4"
+      ]
+    },
+    {
+      "id": "gq_d10_04",
+      "question": "SLA phản hồi ban đầu cho ticket P1 là bao lâu?",
+      "route": "simple",
+      "answer": "SLA phản hồi ban đầu cho ticket P1 là 1 giờ.",
+      "latency_ms": 2127,
+      "must_contain_any": [
+        "15 phút",
+        "15p"
+      ],
+      "must_not_contain": [],
+      "phrase_pass": false,
+      "forbidden_pass": true,
+      "expected_top1_doc_id": "sla_p1_2026",
+      "observed_top1_doc_id": null,
+      "top1_pass": false,
+      "passed": false,
+      "errors": [
+        "missing required answer phrase",
+        "top1 retrieval not available in this LangGraph lab"
+      ],
+      "grading_criteria": [
+        "Nêu đúng 15 phút",
+        "Top-1 retrieval nên là sla_p1_2026"
+      ]
+    },
+    {
+      "id": "gq_d10_05",
+      "question": "SLA resolution cho ticket P1 là bao nhiêu giờ?",
+      "route": "simple",
+      "answer": "SLA resolution cho ticket P1 là 4 giờ.",
+      "latency_ms": 2291,
+      "must_contain_any": [
+        "4 giờ",
+        "4h"
+      ],
+      "must_not_contain": [],
+      "phrase_pass": true,
+      "forbidden_pass": true,
+      "expected_top1_doc_id": "sla_p1_2026",
+      "observed_top1_doc_id": null,
+      "top1_pass": false,
+      "passed": false,
+      "errors": [
+        "top1 retrieval not available in this LangGraph lab"
+      ],
+      "grading_criteria": [
+        "Nêu đúng 4 giờ",
+        "Top-1 retrieval nên là sla_p1_2026"
+      ]
+    },
+    {
+      "id": "gq_d10_06",
+      "question": "Nếu không có phản hồi với ticket P1 sau bao lâu thì hệ thống auto escalate?",
+      "route": "missing_info",
+      "answer": "Could you share more details about what needs to be fixed or the account/order involved? Original request: Nếu không có phản hồi với ticket P1 sau bao lâu thì hệ thống auto escalate?",
+      "latency_ms": 1539,
+      "must_contain_any": [
+        "10 phút"
+      ],
+      "must_not_contain": [],
+      "phrase_pass": false,
+      "forbidden_pass": true,
+      "expected_top1_doc_id": "sla_p1_2026",
+      "observed_top1_doc_id": null,
+      "top1_pass": false,
+      "passed": false,
+      "errors": [
+        "missing required answer phrase",
+        "top1 retrieval not available in this LangGraph lab"
+      ],
+      "grading_criteria": [
+        "Nêu đúng 10 phút",
+        "Không trả lời sai giá trị escalation"
+      ]
+    },
+    {
+      "id": "gq_d10_07",
+      "question": "Tài khoản bị khóa sau bao nhiêu lần đăng nhập sai liên tiếp?",
+      "route": "simple",
+      "answer": "Tài khoản sẽ bị khóa sau một số lần đăng nhập sai liên tiếp, nhưng số lần cụ thể không được cung cấp trong thông tin hiện có. Bạn có thể kiểm tra chính sách của dịch vụ để biết thêm chi tiết.",
+      "latency_ms": 2494,
+      "must_contain_any": [
+        "5 lần"
+      ],
+      "must_not_contain": [],
+      "phrase_pass": false,
+      "forbidden_pass": true,
+      "expected_top1_doc_id": "it_helpdesk_faq",
+      "observed_top1_doc_id": null,
+      "top1_pass": false,
+      "passed": false,
+      "errors": [
+        "missing required answer phrase",
+        "top1 retrieval not available in this LangGraph lab"
+      ],
+      "grading_criteria": [
+        "Nêu đúng 5 lần",
+        "Top-1 retrieval nên là it_helpdesk_faq"
+      ]
+    },
+    {
+      "id": "gq_d10_08",
+      "question": "VPN cho phép kết nối tối đa bao nhiêu thiết bị cùng lúc?",
+      "route": "simple",
+      "answer": "Xin lỗi, nhưng thông tin về số lượng thiết bị tối đa có thể kết nối cùng lúc với VPN không có sẵn. Bạn có thể kiểm tra trên trang web của nhà cung cấp VPN để biết thêm chi tiết.",
+      "latency_ms": 6270,
+      "must_contain_any": [
+        "2 thiết bị",
+        "2 device",
+        "2"
+      ],
+      "must_not_contain": [],
+      "phrase_pass": false,
+      "forbidden_pass": true,
+      "expected_top1_doc_id": "it_helpdesk_faq",
+      "observed_top1_doc_id": null,
+      "top1_pass": false,
+      "passed": false,
+      "errors": [
+        "missing required answer phrase",
+        "top1 retrieval not available in this LangGraph lab"
+      ],
+      "grading_criteria": [
+        "Nêu đúng giới hạn 2 thiết bị",
+        "Không lấy thông tin từ tài liệu khác"
+      ]
+    },
+    {
+      "id": "gq_d10_09",
+      "question": "Nhân viên dưới 3 năm kinh nghiệm được bao nhiêu ngày phép năm theo chính sách HR 2026?",
+      "route": "simple",
+      "answer": "Theo chính sách HR 2026, nhân viên dưới 3 năm kinh nghiệm được hưởng 12 ngày phép năm.",
+      "latency_ms": 2019,
+      "must_contain_any": [
+        "12 ngày",
+        "12 ngày phép năm"
+      ],
+      "must_not_contain": [
+        "10 ngày phép năm",
+        "10 ngày phép"
+      ],
+      "phrase_pass": true,
+      "forbidden_pass": true,
+      "expected_top1_doc_id": "hr_leave_policy",
+      "observed_top1_doc_id": null,
+      "top1_pass": false,
+      "passed": false,
+      "errors": [
+        "top1 retrieval not available in this LangGraph lab"
+      ],
+      "grading_criteria": [
+        "Nêu đúng 12 ngày phép năm",
+        "Không chấp nhận 10 ngày phép năm (bản HR 2025)",
+        "Top-1 retrieval nên là hr_leave_policy"
+      ]
+    },
+    {
+      "id": "gq_d10_10",
+      "question": "Level 4 Admin Access yêu cầu phê duyệt bởi ai?",
+      "route": "missing_info",
+      "answer": "Could you share more details about what needs to be fixed or the account/order involved? Original request: Level 4 Admin Access yêu cầu phê duyệt bởi ai?",
+      "latency_ms": 1143,
+      "must_contain_any": [
+        "IT Manager",
+        "CISO"
+      ],
+      "must_not_contain": [],
+      "phrase_pass": false,
+      "forbidden_pass": true,
+      "expected_top1_doc_id": "access_control_sop",
+      "observed_top1_doc_id": null,
+      "top1_pass": false,
+      "passed": false,
+      "errors": [
+        "missing required answer phrase",
+        "top1 retrieval not available in this LangGraph lab"
+      ],
+      "grading_criteria": [
+        "Nêu đúng IT Manager và/hoặc CISO",
+        "Top-1 retrieval nên là access_control_sop"
+      ]
+    }
+  ]
+}

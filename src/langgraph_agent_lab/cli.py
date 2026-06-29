@@ -11,6 +11,7 @@ import yaml
 
 from .graph import build_graph
 from .metrics import MetricsReport, metric_from_state, summarize_metrics, write_metrics
+from .observability import configure_langsmith
 from .persistence import build_checkpointer
 from .report import write_report
 from .scenarios import load_scenarios
@@ -25,6 +26,7 @@ def run_scenarios(
     output: Annotated[Path, typer.Option("--output")],
 ) -> None:
     """Run all grading scenarios and write metrics JSON."""
+    configure_langsmith()
     cfg = yaml.safe_load(config.read_text(encoding="utf-8"))
     scenarios = load_scenarios(cfg["scenarios_path"])
     checkpointer = build_checkpointer(cfg.get("checkpointer", "memory"), cfg.get("database_url"))
@@ -32,9 +34,23 @@ def run_scenarios(
     metrics = []
     for scenario in scenarios:
         state = initial_state(scenario)
-        run_config = {"configurable": {"thread_id": state["thread_id"]}}
+        scenario_id = scenario.id
+        run_config = {
+            "configurable": {"thread_id": scenario_id},
+            "tags": ["day8", "langgraph", "lab"],
+            "metadata": {
+                "scenario_id": scenario_id,
+                "lab": "phase2-track3-day8",
+            },
+        }
         final_state = graph.invoke(state, config=run_config)
-        metrics.append(metric_from_state(final_state, scenario.expected_route.value, scenario.requires_approval))
+        metrics.append(
+            metric_from_state(
+                final_state,
+                scenario.expected_route.value,
+                scenario.requires_approval,
+            )
+        )
     report = summarize_metrics(metrics)
     write_metrics(report, output)
     if cfg.get("report_path"):

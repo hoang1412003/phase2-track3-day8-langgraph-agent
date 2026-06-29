@@ -1,38 +1,12 @@
-"""Report generation helper."""
+# Day 08 LangGraph Agent Lab Report
 
-from __future__ import annotations
+## 1. Team / student
 
-from pathlib import Path
+- Name: Thân Văn Hoàng
+- Repo/commit: https://github.com/hoang1412003/phase2-track3-day8-2A202600582-ThanVanHoang
+- Date: 29/6/2026
 
-from .metrics import MetricsReport
-from .observability import langsmith_project_name
-
-
-def render_report(metrics: MetricsReport) -> str:
-    """Render a complete markdown lab report from metrics data."""
-    rows = []
-    row_template = (
-        "| {scenario} | {expected} | {actual} | {success} | "
-        "{retries} | {interrupts} | {approval} |"
-    )
-    for item in metrics.scenario_metrics:
-        rows.append(
-            row_template.format(
-                scenario=item.scenario_id,
-                expected=item.expected_route,
-                actual=item.actual_route or "",
-                success="yes" if item.success else "no",
-                retries=item.retry_count,
-                interrupts=item.interrupt_count,
-                approval=item.approval_action or "",
-            )
-        )
-    scenario_table = "\n".join(rows)
-    project_name = langsmith_project_name()
-
-    return f"""# Day 08 LangGraph Agent Lab Report
-
-## 1. Architecture
+## 2. Architecture
 
 The workflow is a LangGraph `StateGraph` for support-ticket orchestration:
 `START -> intake -> classify`, then conditional routing to `answer`, `tool`, `clarify`,
@@ -42,7 +16,7 @@ or `risky_action`. Runtime errors are not classifier routes. Tool paths run
 `risky_action -> approval` before any tool execution. Every terminal path passes through
 `finalize -> END`.
 
-## 2. State Schema
+## 3. State Schema
 
 | Field | Reducer | Purpose |
 |---|---|---|
@@ -58,31 +32,37 @@ or `risky_action`. Runtime errors are not classifier routes. Tool paths run
 | events, audit_events | append | Audit trail for grading/debugging |
 | nodes_visited | append | Node-level trace for metrics |
 
-## 3. Test Cases
+## 4. Scenario results
 
 The sample scenario set covers simple answers, lookup/tool usage, missing information,
 risky refund/delete actions, runtime tool failures, and dead-letter retry exhaustion.
 Hidden scenarios should still work because classification is LLM structured output rather
 than scenario-id matching.
 
-## 4. Metrics
+### Metrics
 
 | Metric | Value |
 |---|---:|
-| Total scenarios | {metrics.total_scenarios} |
-| Success rate | {metrics.success_rate:.2%} |
-| Average nodes visited | {metrics.avg_nodes_visited:.2f} |
-| Average latency ms | {metrics.avg_latency_ms:.2f} |
-| Total retries | {metrics.total_retries} |
-| Total interrupts/approvals | {metrics.total_interrupts} |
-| Approval observations | {metrics.total_approvals} |
-| Approval rate | {metrics.approval_rate:.2%} |
+| Total scenarios | 7 |
+| Success rate | 100.00% |
+| Average nodes visited | 7.00 |
+| Average latency ms | 0.00 |
+| Total retries | 3 |
+| Total interrupts/approvals | 2 |
+| Approval observations | 2 |
+| Approval rate | 100.00% |
 
 | Scenario | Expected route | Actual route | Success | Retries | Interrupts | Approval action |
 |---|---|---|---:|---:|---:|---|
-{scenario_table}
+| S01_simple | simple | simple | yes | 0 | 0 |  |
+| S02_tool | tool | tool | yes | 0 | 0 |  |
+| S03_missing | missing_info | missing_info | yes | 0 | 0 |  |
+| S04_risky | risky | risky | yes | 0 | 1 | approve |
+| S05_error | tool | tool | yes | 2 | 0 |  |
+| S06_delete | risky | risky | yes | 0 | 1 | approve |
+| S07_dead_letter | tool | tool | yes | 1 | 0 |  |
 
-## 5. Failure Analysis
+## 5. Failure analysis
 
 1. Retry or tool failure: transient tool outputs include `ERROR`, so `evaluate` returns
 `needs_retry`. The graph increments `attempt`, retries while below `max_attempts`, and sends
@@ -92,17 +72,17 @@ unresolved failures to `dead_letter` with a typed error.
 They first create `proposed_action`, record an approval decision, and only approved or edited
 actions proceed. Rejected actions route to clarification.
 
-## 6. Persistence / Recovery Evidence
+## 6. Persistence / recovery evidence
 
 The CLI passes a stable `thread_id` per scenario. The default checkpointer is in-memory for
 fast local tests, and the `sqlite` backend can persist checkpoints to
 `outputs/langgraph_checkpoints.sqlite` when `checkpointer: sqlite` is selected.
 
-## 7. LangSmith Tracing
+## 7. Extension work (LangSmith Tracing)
 
 | Item | Value |
 |---|---|
-| LangSmith project | {project_name} |
+| LangSmith project | phase2-track3-day8-langgraph-lab |
 | Tags | `day8`, `langgraph`, `lab` |
 | Run metadata | `scenario_id`, `lab=phase2-track3-day8` |
 
@@ -135,16 +115,8 @@ The screenshots are stored in `reports/langsmith_trace/`.
 
 ![LangSmith trace q7](langsmith_trace/q7.png)
 
-## 8. Improvement Plan
+## 8. Improvement plan
 
 With more production time, I would add a real approval UI for interrupt/resume, richer tool
 contracts, latency timing around each node, regression tests for hidden route phrasing, and
 state-history replay examples for crash recovery.
-"""
-
-
-def write_report(metrics: MetricsReport, output_path: str | Path) -> None:
-    """Write the rendered report to a file."""
-    path = Path(output_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_report(metrics), encoding="utf-8")

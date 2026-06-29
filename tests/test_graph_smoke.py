@@ -35,7 +35,7 @@ from langgraph_agent_lab.state import Route, Scenario, initial_state
         ("Please lookup order status for order 123", Route.TOOL.value),
         ("Refund this customer", Route.RISKY.value),
         ("Can you fix it?", Route.MISSING_INFO.value),
-        ("Timeout failure while processing", Route.ERROR.value),
+        ("Timeout failure while processing", Route.TOOL.value),
     ],
 )
 def test_graph_runs_and_routes_correctly(query, expected_route):
@@ -55,7 +55,7 @@ def test_graph_terminates_all_routes():
         ("lookup order status 999", Route.TOOL),
         ("fix it", Route.MISSING_INFO),
         ("delete user account now", Route.RISKY),
-        ("timeout error in system", Route.ERROR),
+        ("timeout error in system", Route.TOOL),
     ]
     for query, route in queries:
         scenario = Scenario(id=f"term-{route.value}", query=query, expected_route=route)
